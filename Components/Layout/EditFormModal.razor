@@ -1,0 +1,64 @@
+﻿@inherits ModalBase
+
+@if (IsOpen)
+{
+    <div class="modal" tabindex="-1" style="display: block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Film szerkesztése</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="editName">Név:</label>
+                        <input type="text" class="form-control" id="editName" @bind="SelectedMovie.Name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editDescription">Leírás:</label>
+                        <input type="text" class="form-control" id="editDescription" @bind="SelectedMovie.Description" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editGenre">Műfaj:</label>
+                        <input type="text" class="form-control" id="editGenre" @bind="SelectedMovie.Genre" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editAgeRating">Korhatár:</label>
+                        <input type="number" class="form-control" id="editAgeRating" @bind="SelectedMovie.AgeRating" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editLength">Hossz:</label>
+                        <input type="text" class="form-control" id="editLength" @bind="SelectedMovie.Length" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editReleaseYear">Kiadás éve:</label>
+                        <input type="number" class="form-control" id="editReleaseYear" @bind="SelectedMovie.ReleaseYear" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="SaveChanges">Mentés</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Mégse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@code{
+
+
+    private string LengthString
+    {
+        get => SelectedMovie.Length.ToString(@"hh\:mm"); 
+        set
+        {
+            if (TimeSpan.TryParseExact(value, @"hh\:mm", null, out var result)) 
+            {
+                SelectedMovie.Length = result;
+            }
+            else
+            {
+                // Kezelés, ha az érvénytelen időformátumot adtak meg
+            }
+        }
+    }
+}

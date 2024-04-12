@@ -1,0 +1,104 @@
+﻿@page "/filmlista"
+@rendermode InteractiveServer
+
+@using MovieList.Components.Services;
+@using MovieList.Components.Models;
+@using MovieList.Components.Layout;
+@inject IMovieListService MovieListService
+@inject IJSRuntime JsRuntime  // Not the best aproach
+
+<PageTitle>FilmLista</PageTitle>
+
+<h3>FilmLista</h3>
+
+@if (movies != null && movies.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Név</th>
+                <th>Leírás</th>
+                <th>Műfaj</th>
+                <th>Korhatár</th>
+                <th>Hossz</th>
+                <th>Kiadás éve</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in movies)
+            {
+                <tr>
+                    <td>@movie.Id</td>
+                    <td>@movie.Name</td>
+                    <td>@movie.Description</td>
+                    <td>@movie.Genre</td>
+                    <td>@movie.AgeRating</td>
+                    <td>@movie.Length</td>
+                    <td>@movie.ReleaseYear</td>
+                    <td>
+                        <button @onclick="() => EditMovie(movie.Id)">Szerkesztés</button>
+                        <button @onclick="() => DeleteMovie(movie.Id)">törlés</button> 
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Nincsenek filmek a listában.</p>
+}
+@if (isEditing)
+{@if (isEditing)
+    {
+        <EditFormModal IsOpen="isEditing" SelectedMovie="selectedMovie" OriginalMovie="selectedMovie" OnSave="() => SaveChanges(selectedMovie)" OnCancel="CancelEdit" />
+    }
+
+
+}
+
+
+@code {
+    MovieModel selectedMovie;
+    List<MovieModel>? movies;
+    bool isEditing = false;
+    MovieModel originalMovie;
+
+    protected override void OnInitialized()
+    {
+        movies = MovieListService.GetMovies();
+    }
+
+    private void EditMovie(int id)
+    {
+        selectedMovie = movies.FirstOrDefault(m => m.Id == id);
+       
+        isEditing = true;
+    }
+
+    async Task DeleteMovie(int id)
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Biztos Vagy benne ?");
+        if (confirmed)
+        {
+            MovieListService.DeleteMovie(id);
+        }
+       
+    }
+
+    public async Task SaveChanges(MovieModel selectedMovie)
+    { 
+        MovieListService.UpdateMovie(selectedMovie.Id, selectedMovie);
+        this.selectedMovie = null;
+        isEditing = false;
+    }
+
+    private void CancelEdit()
+    {
+        selectedMovie = null;
+        isEditing = false;
+    }
+
+}

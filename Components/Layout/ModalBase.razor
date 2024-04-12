@@ -1,0 +1,36 @@
+﻿@using MovieList.Components.Models
+@using MovieList.Components.Services;
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public MovieModel SelectedMovie { get; set; }
+
+
+    [Parameter]
+    public MovieModel OriginalMovie { get; set; }
+
+    [Parameter]
+    public EventCallback<MovieModel> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    protected async Task SaveChanges()
+    {
+        await OnSave.InvokeAsync(SelectedMovie);
+    }
+
+    protected async Task CancelEdit()
+    {
+        SelectedMovie = OriginalMovie;
+        Close();
+    }
+
+    public void Close()
+    {
+        IsOpen = false;
+    }
+}
